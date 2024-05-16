@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>boeing simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #1f1f1f;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #planeCount {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+    #upgradeBtn, #makePlaneBtn {
+      background-color: #3498db;
+      color: white;
+    }
+    #upgradeBtn:hover, #makePlaneBtn:hover {
+      background-color: #2980b9;
+    }
+    #upgradeBtn:disabled, #makePlaneBtn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f1f1f1;
+      padding: 20px;
+      border: 2px solid #ccc;
+      z-index: 9999;
+    }
+    #closePopup {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>boeing simulator</h1>
+  <div id="planeCount">Planes built: <span id="count">0</span></div>
+  <button id="makePlaneBtn" onclick="makePlane()">make planes</button>
+  <button id="upgradeBtn" onclick="upgrade()" disabled>Upgrade CPS (Cost: <span id="upgradeCost">50</span> planes)</button>
+
+  <div id="popup">
+    <span id="closePopup" onclick="closePopup()">X</span>
+    <h2>Uh oh!!</h2>
+    <p id="popupSubtitle"></p>
+  </div>
+
+  <script>
+    let planeCount = 0;
+    let cps = 0;
+    let autoclicker = false;
+    let upgradeCost = 50;
+
+    function makePlane() {
+      planeCount++;
+      document.getElementById("count").innerText = planeCount;
+
+      if (planeCount >= 1500 && !autoclicker) {
+        autoclicker = true;
+        cps = 1; // Start with 1 CPS
+        document.getElementById("upgradeBtn").disabled = false;
+      }
+
+      if (autoclicker) {
+        cps += 2; // Upgrade CPS by 2 every time makePlane is called
+      }
+
+      // Check if 1000 planes are built
+      if (planeCount >= 1000 && planeCount % 1000 === 0) {
+        showPopup();
+        // Simulate random plane accidents
+        const accidents = [
+          "A door fell off your plane! Should've gone to specsavers",
+          "One of your planes crashed... And it was because of your engineering.",
+          "One of your planes had an engine failure! it landed safely and is now being repaired."
+        ];
+        const randomAccident = accidents[Math.floor(Math.random() * accidents.length)];
+        document.getElementById("popupSubtitle").innerText = randomAccident;
+      }
+    }
+
+    function showPopup() {
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+
+    function upgrade() {
+      if (planeCount >= upgradeCost) {
+        cps += 2;
+        planeCount -= upgradeCost;
+        upgradeCost *= 2;
+        document.getElementById("count").innerText = planeCount;
+        document.getElementById("upgradeCost").innerText = upgradeCost;
+      } else {
+        alert("Not enough planes to upgrade!");
+      }
+    }
+
+    // Auto click function
+    setInterval(function() {
+      makePlane();
+    }, 1000 / cps);
+  </script>
+</body>
+</html>
